@@ -2,8 +2,6 @@ package com.tweetero.api.controllers;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,38 +11,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tweetero.api.dtos.UserDTO;
 import com.tweetero.api.models.UserModel;
-import com.tweetero.api.repositories.UserRepository;
+import com.tweetero.api.service.UserService;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public class UserController {    
 
-    final UserRepository userRepository;
+    final UserService userService;
     
-    UserController(UserRepository repository){
-        this.userRepository = repository;
+    UserController(UserService userService){
+        this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<Object> createUser(@RequestBody @Valid UserDTO body){
+    public ResponseEntity<Object> createUser(@RequestBody @Valid UserDTO body) {
+        Optional<UserModel> user = userService.save(body);
 
-        ExampleMatcher matcher = ExampleMatcher.matching()
-            .withIgnorePaths("id");
-
-        Example<UserModel> example = Example.of(new UserModel(body), matcher);
-
-        Optional<UserModel> userRepeated = userRepository.findOne(example);
-
-        if(!userRepeated.isPresent()){
-            UserModel user = new UserModel(body);
-            userRepository.save(user);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Usuario já existe");
+        if (!user.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("A User with this title already exists");
         }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
     
 }
