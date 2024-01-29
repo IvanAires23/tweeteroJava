@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class UserDTO {
+public class TweetDTO {
 
     @NotBlank
-    private String username;
+    private String text;
     
-    @NotBlank
-    private String avatar;
-}
+    private Long userId;
+    
+} 

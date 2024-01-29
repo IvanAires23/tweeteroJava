@@ -28,7 +28,7 @@ public class UserModel {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
     
     @Column(nullable = false)
